@@ -1,0 +1,5 @@
+openpyxl
+utils
+requests
+sendgrid
+xlsx2html
