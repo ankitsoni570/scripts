@@ -1,0 +1,195 @@
+curl -v --unix-socket /var/run/docker.sock  http://localhost/containers/94babe64e19d/stats
+cd  /sys/fs/cgroup/blkio/docker
+
+
+docker run -d --name=cadvisor -p 8080:8080 --volume=/var/run:/var/run:rw --volume=/sys:/sys:ro --volume=/var/lib/docker/:/var/lib/docker:ro google/cadvisor:latest
+
+sudo docker stats --no-stream $(sudo docker ps|grep -v "NAMES"|awk '{ print $NF }'|tr "\n" " ") | sort -k 7,9 -h
+docker stats --no-stream | grep container1 | awk -v date="$(date +%T)" '{print $4, date}' | sed -e 's/MiB//g'
+docker rm -v $(docker ps -a -q -f status=exited)
+
+
+-------------------------------
+
+https://developercommunity.visualstudio.com/t/api-to-get-current-number-of-builds-running-and-qu/969466
+https://github.com/webdevops/azure-devops-exporter/issues/17
+
+
+
+docker stats --no-stream | awk -v date="$(date +%T)" '{print $4, date}'
+
+error: docker-compose: error while loading shared libraries: libz.so.1: failed to map segment from shared object: Operation not permitted
+solution: sudo mount /tmp -o remount,exec
+-------------------------------------------------------------------------------
+
+$(date "+%Y-%m-%d" --date="yesterday")
+
+ls | grep -E '(test|console)' | grep -E -v '(console_output_2021-05-28.txt|test_2021-05-28.xlsx)' | tr '\n' ' '
+
+#ENV PATH="/_work/_tool/Python/3.9.0/x64/bin:${PATH}"
+#RUN python3.9 -m pip install --upgrade pip && python3.9 -m pip install -r requirements.txt
+==============================================================================
+
+curl -u :{PAT} 'https://dev.azure.com/{company}/{project}/_apis/wit/wiql/{query ID}?api-version=5.1'
+
+==============================================================================
+
+sudo lsof -i -P -n | grep LISTEN
+sudo netstat -tulpn | grep LISTEN
+sudo netstat -anp | grep LISTEN
+sudo ss -tulpn | grep LISTEN
+sudo lsof -i:22 ## see a specific port such as 22 ##
+sudo nmap -sTU -O IP-address-Here
+
+==============================================================================
+/etc/centos-release
+/etc/os-release
+/etc/redhat-release
+/etc/system-release
+
+==============================================================================
+To view open ports, use the following command.
+
+firewall-cmd --list-ports
+We use the following to see services whose ports are open.
+
+firewall-cmd --list-services
+We use the following to see services whose ports are open and see open ports
+
+firewall-cmd --list-all
+To add a service to the firewall, we use the following command, in which case the service will use any port to open in the firewall.
+
+firewall-cmd --add-services=ntp 
+For this service to be permanently open we use the following command.
+
+firewall-cmd —add-service=ntp --permanent 
+To add a port, use the following command
+
+firewall-cmd --add-port=132/tcp  --permanent
+To run the firewall must be reloaded using the following command.
+
+firewall-cmd --reload
+
+==============================================================================
+
+You can launch a Python program through pdb by using pdb myscript.py or python -m pdb myscript.py.
+
+There are a few commands you can then issue, which are documented on the pdb page.
+
+Some useful ones to remember are:
+
+b: set a breakpoint
+c: continue debugging until you hit a breakpoint
+s: step through the code
+n: to go to next line of code
+l: list source code for the current file (default: 11 lines including the line being executed)
+u: navigate up a stack frame
+d: navigate down a stack frame
+p: to print the value of an expression in the current context
+
+
+==============================================================================
+
+- job_name: node_exporter 
+	scrape_interval: 1m 
+	scrape_timeout:  1m 
+	metrics_path: "/metrics" 
+	static_configs: 
+	- targets: ['localhost:9100']
+	
+
+==============================================================================
+===============================================================================================================
+
+- alert: CriticallyLowDiskSpace
+      expr: 
+        (100 - 100 * (node_filesystem_avail_bytes{device!~"by-uuid",device!~"tmpfs"} / node_filesystem_size_bytes{device!~"by-uuid",device!~"tmpfs"}) or 100 - 100 * (node_filesystem_avail{device!~"by-uuid",device!~"tmpfs"} / node_filesystem_size{device!~"by-uuid",device!~"tmpfs"}))  >= 90 or (100 - 100 * (wmi_logical_disk_free_bytes{volume!~"HarddiskVolume.+"}/wmi_logical_disk_size_bytes{volume!~"HarddiskVolume.+"})) >= 90
+      for: 30m
+      labels:
+        severity: Critical
+        type: Infra
+      annotations:
+        title: 'Less than 10% disk space left for (instance {{ $labels.instance }})'
+        description: "There's {{ $value }}% disk space used (instance {{ $labels.instance }}) which is higher than the critical threshold value of 90 % for last 30 Minutes"
+        value: '{{ $value | humanize }}%'
+        device: '{{ $labels.device }}%'
+        mount_point: '{{ $labels.mountpoint }}%'
+ 
+    - alert: LowDiskSpace
+      expr:  (100 - 100 * (node_filesystem_avail_bytes{device!~"by-uuid",device!~"tmpfs"} / node_filesystem_size_bytes{device!~"by-uuid",device!~"tmpfs"}) or 100 - 100 * (node_filesystem_avail{device!~"by-uuid",device!~"tmpfs"} / node_filesystem_size{device!~"by-uuid",device!~"tmpfs"})) >= 80 or (100 - 100 * (wmi_logical_disk_free_bytes{volume!~"HarddiskVolume.+"}/wmi_logical_disk_size_bytes{volume!~"HarddiskVolume.+"})) >= 80
+      for: 30m
+      labels:
+        severity: Warning
+        type: Infra
+      annotations:
+        title: 'Less than 20% disk space left (instance {{ $labels.instance }})'
+        description: "There's  {{ $value }}% disk space used (instance {{ $labels.instance }}) which is higher than the warning threshold value of 80 % for last 30 Minutes"
+          
+        value: '{{ $value | humanize }}%'
+        device: '{{ $labels.device }}'
+        mount_point: '{{ $labels.mountpoint }}'
+		
+		
+=====================================================================
+
+100 - ((node_filesystem_avail_bytes{instance=~"$instance",mountpoint="$maxmount"} * 100) / node_filesystem_size_bytes{instance=~"$instance",mountpoint="$maxmount"})
+
+=================================================================================================
+-------------------------------------------------------------------------------------------------
+
+[azadmin@l33q13814500092 ~]$ blkid
+/dev/sda1: SEC_TYPE="msdos" UUID="2DD0-5A2D" TYPE="vfat" PARTLABEL="EFI System Partition" PARTUUID="99f9c290-84a9-42eb-a16a-cd8d9f8ce088"
+/dev/sda2: UUID="7e8d87c4-1c64-4ad5-a1f2-f8afc9a59517" TYPE="xfs" PARTUUID="b3189740-eef3-45f0-9195-337bc65ead44"
+/dev/sda4: UUID="5T6HgI-Q5qO-MJCx-4FVm-3rMU-GO8q-pCN4OJ" TYPE="LVM2_member" PARTUUID="e2ee0e25-efe7-4cc1-93b2-71d2b103afb9"
+/dev/sdd1: UUID="5cXbzr-XaYq-DVFX-Hcr2-EiY6-j9Z1-pcw9Oy" TYPE="LVM2_member" PARTLABEL="xfspart" PARTUUID="a74077fa-3e30-488c-9045-43b75822b4ef"
+/dev/sdc1: UUID="qeoA3J-j7bX-wMSm-XIcI-rtfm-KY8h-UkRVJp" TYPE="LVM2_member" PARTLABEL="xfspart" PARTUUID="1ddadadc-896c-48a5-a920-de8d9cfddde6"
+/dev/sdb1: UUID="66c4bc30-e0ec-46ec-86a3-c3264c5773e9" TYPE="ext4"
+/dev/mapper/VolGroup01-data: UUID="cd0a9542-2157-45c9-b0ae-906c5e102454" TYPE="ext3"
+/dev/mapper/rootvg-tmplv: UUID="b75ee43e-91d4-4b0a-9a19-e9c46453f5dd" TYPE="xfs"
+/dev/mapper/rootvg-usrlv: UUID="7c9ff6b4-2eb8-4881-bab7-2b5aefcd9dc9" TYPE="xfs"
+/dev/mapper/rootvg-optlv: UUID="dd467c2d-76c7-48ee-9b74-253de80168b8" TYPE="xfs"
+/dev/mapper/rootvg-homelv: UUID="86850071-3d42-4f5f-81bf-d49cc9f9bc98" TYPE="xfs"
+/dev/mapper/rootvg-varlv: UUID="210f2439-b5cb-477f-a363-c4512864a555" TYPE="xfs"
+/dev/mapper/rootvg-rootlv: UUID="42951869-fca1-4794-95e6-54a1ad0ef666" TYPE="xfs"
+=====================================================================================
+
+[azadmin@l33q13814500092 ~]$ lsblk
+NAME                MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
+sda                   8:0    0  256G  0 disk
+├─sda1                8:1    0  500M  0 part /boot/efi
+├─sda2                8:2    0  500M  0 part /boot
+├─sda3                8:3    0    2M  0 part
+└─sda4                8:4    0   63G  0 part
+  ├─rootvg-tmplv    253:1    0    2G  0 lvm
+  ├─rootvg-usrlv    253:2    0   10G  0 lvm  /usr
+  ├─rootvg-optlv    253:3    0    2G  0 lvm  /opt
+  ├─rootvg-homelv   253:4    0    1G  0 lvm  /home
+  ├─rootvg-varlv    253:5    0    8G  0 lvm  /var
+  └─rootvg-rootlv   253:6    0    2G  0 lvm  /
+sdb                   8:16   0  256G  0 disk
+└─sdb1                8:17   0  256G  0 part /mnt/resource
+sdc                   8:32   0  256G  0 disk
+└─sdc1                8:33   0  256G  0 part
+  └─VolGroup01-data 253:0    0  512G  0 lvm  /mnt/data
+sdd                   8:48   0  256G  0 disk
+└─sdd1                8:49   0  256G  0 part
+  └─VolGroup01-data 253:0    0  512G  0 lvm  /mnt/data
+======================================================================================
+vim /etc/fstab
+
+/dev/mapper/VolGroup01-data		/mnt/data	ext3	defaults	0	0
+
+------------------------------------------------------------------------------------------------------------
+
+Extending a LVM size in Linux:
+https://www.tecmint.com/extend-and-reduce-lvms-in-linux/
+
+------------------------------------------------------------------------------------------------------------
+============================================================================================================
+
+
+  - name: MyLaunchName
+    ${{ if eq( variables['Build.RequestedFor'], 'Ankit Soni' ) }}: 
+      value: $(LaunchName)"_Scheduled"
+    ${{ if ne( variables['Build.RequestedFor'], 'Ankit Soni' ) }}: 
+      value: $(LaunchName)"_"$(Build.Reason)
