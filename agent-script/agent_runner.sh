@@ -1,6 +1,6 @@
 #!/bin/bash -x
 
-image=p21d13802541001.azurecr.io/headless-agent:latest
+image=agent:latest
 
 echo "raising new agents"
 echo "pool name: "
@@ -22,14 +22,14 @@ prefix=$REPLY
 echo "docker secret: "
 read -s
 echo $REPLY >  password.txt
-cat password.txt | docker login p21d13802541001.azurecr.io --username p21d13802541001 --password-stdin
+cat password.txt | docker login <repo-url> --username <username> --password-stdin
 rm password.txt
 
 for (( i = $index; i < $index+$amount; i++ )); do
     agent_name=${prefix}-${i}
     docker run -d  \
-               -e VSTS_ACCOUNT=GPP-SP \
-               -e VSTS_TOKEN=7tupnem3kbux3nqay3s3ji3ps4ks2ytef3skwhc5xgjqxnkh7uaa \
+               -e VSTS_ACCOUNT=SP \
+               -e VSTS_TOKEN=<PAT> \
                -e VSTS_AGENT=$agent_name \
                -e VSTS_POOL=$pool \
                -e VSTS_WORK='/var/vsts/$VSTS_AGENT' \
